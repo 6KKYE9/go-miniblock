@@ -63,21 +63,30 @@ func TestHTTPFlow(t *testing.T) {
 	defer ts.Close()
 
 	// 提交交易
-	resp, _ := http.Post(ts.URL+"/tx", "application/json", strings.NewReader(`{"from":"a","to":"b","amount":10}`))
+	resp, err := http.Post(ts.URL+"/tx", "application/json", strings.NewReader(`{"from":"a","to":"b","amount":10}`))
+	if err != nil {
+		t.Fatalf("提交交易请求失败: %v", err)
+	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		t.Fatalf("提交交易状态码 %d", resp.StatusCode)
 	}
 
 	// 挖矿
-	m, _ := http.Post(ts.URL+"/mine", "application/json", nil)
+	m, err := http.Post(ts.URL+"/mine", "application/json", nil)
+	if err != nil {
+		t.Fatalf("挖矿请求失败: %v", err)
+	}
 	defer m.Body.Close()
 	if m.StatusCode != 200 {
 		t.Fatalf("挖矿状态码 %d", m.StatusCode)
 	}
 
 	// 校验
-	v, _ := http.Get(ts.URL + "/validate")
+	v, err := http.Get(ts.URL + "/validate")
+	if err != nil {
+		t.Fatalf("校验请求失败: %v", err)
+	}
 	defer v.Body.Close()
 	var vr struct {
 		Valid string `json:"valid"`
